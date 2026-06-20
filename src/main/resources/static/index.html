@@ -143,10 +143,12 @@
                     },
                     body: scriptText
                 });
+                let resultText = await response.text();
 
-                const resultText = await response.text();
-                
-                // Parse the combined JSON response
+                // AI ke extra markdown tags ko saaf karne ka jaadu:
+                resultText = resultText.replace(/```json/g, "").replace(/```/g, "").trim();
+
+                // Ab clean text ko parse karein
                 const data = JSON.parse(resultText);
 
                 // Display formatting
