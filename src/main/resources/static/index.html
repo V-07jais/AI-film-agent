@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Film Production Agent</title>
+    <style>
+        /* A creative, poster-style sketch aesthetic */
+        @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Poppins:wght@400;600&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f1ea; /* Canvas like background */
+            color: #2c3e50;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+        }
+        h1 {
+            font-family: 'Caveat', cursive;
+            font-size: 3.5rem;
+            text-align: center;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 0px #ffb6b9;
+        }
+        p.subtitle {
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+        
+        /* The Doodle Box Effect */
+        .sketch-box {
+            border: 3px solid #2c3e50;
+            border-radius: 2px 255px 3px 25px / 255px 5px 225px 3px;
+            padding: 25px;
+            background: #fff;
+            box-shadow: 6px 6px 0px #2c3e50;
+            margin-bottom: 30px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            padding: 10px;
+            border: 2px dashed #7f8c8d;
+            border-radius: 10px;
+            outline: none;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            font-family: 'Caveat', cursive;
+            font-size: 1.8rem;
+            background-color: #f39c12;
+            color: #fff;
+            border: 3px solid #2c3e50;
+            border-radius: 2px 255px 3px 25px / 255px 5px 225px 3px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: 0.2s;
+            box-shadow: 4px 4px 0px #2c3e50;
+        }
+        button:hover {
+            background-color: #e67e22;
+            transform: translateY(2px);
+            box-shadow: 2px 2px 0px #2c3e50;
+        }
+        .loader {
+            display: none;
+            text-align: center;
+            font-weight: bold;
+            color: #d35400;
+            margin-top: 10px;
+        }
+        
+        pre {
+            background-color: #f8f9f9;
+            padding: 15px;
+            border-left: 5px solid #f39c12;
+            overflow-x: auto;
+            font-size: 0.9rem;
+        }
+        #result-section {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🎬 AI Line Producer</h1>
+        <p class="subtitle">Multi-Agent Script Breakdown & Logistics Planner</p>
+
+        <div class="sketch-box">
+            <label for="scriptInput"><b>📝 Paste Your Scene Script Here:</b></label>
+            <textarea id="scriptInput" placeholder="E.g., Raju aur Shyam subah-subah gaon ke mandir ke paas khade the..."></textarea>
+            <button onclick="runPipeline()">Generate Production Plan 🚀</button>
+            <div id="loading" class="loader">Agents are thinking... Please wait! ⏳</div>
+        </div>
+
+        <div id="result-section">
+            <div class="sketch-box">
+                <h3 style="font-family: 'Caveat', cursive; font-size: 2rem; margin-top: 0;">📍 Agent 1: Scene Breakdown</h3>
+                <pre id="breakdownOutput"></pre>
+            </div>
+
+            <div class="sketch-box">
+                <h3 style="font-family: 'Caveat', cursive; font-size: 2rem; margin-top: 0;">🎥 Agent 2: Logistics & Equipment</h3>
+                <pre id="logisticsOutput"></pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function runPipeline() {
+            const scriptText = document.getElementById('scriptInput').value;
+            if (!scriptText) {
+                alert("Please enter a script first!");
+                return;
+            }
+
+            // Show loading, hide old results
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('result-section').style.display = 'none';
+
+            try {
+                // Seedha Spring Boot API ko hit kar rahe hain
+                const response = await fetch('/api/v1/agent/pipeline', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/plain'
+                    },
+                    body: scriptText
+                });
+
+                const resultText = await response.text();
+                
+                // Parse the combined JSON response
+                const data = JSON.parse(resultText);
+
+                // Display formatting
+                document.getElementById('breakdownOutput').textContent = JSON.stringify(data.sceneBreakdown, null, 2);
+                document.getElementById('logisticsOutput').textContent = JSON.stringify(data.logisticsAndPlanning, null, 2);
+
+                // Show the results section
+                document.getElementById('result-section').style.display = 'block';
+
+            } catch (error) {
+                alert("Something went wrong! " + error);
+            } finally {
+                // Hide loading
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
