@@ -5,99 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Film Production Agent</title>
     <style>
-        /* A creative, poster-style sketch aesthetic */
         @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Poppins:wght@400;600&display=swap');
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f4f1ea; /* Canvas like background */
-            color: #2c3e50;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-        }
-        .container {
-            max-width: 800px;
-            width: 100%;
-        }
-        h1 {
-            font-family: 'Caveat', cursive;
-            font-size: 3.5rem;
-            text-align: center;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 0px #ffb6b9;
-        }
-        p.subtitle {
-            text-align: center;
-            font-weight: 600;
-            margin-bottom: 30px;
-        }
-        
-        /* The Doodle Box Effect */
-        .sketch-box {
-            border: 3px solid #2c3e50;
-            border-radius: 2px 255px 3px 25px / 255px 5px 225px 3px;
-            padding: 25px;
-            background: #fff;
-            box-shadow: 6px 6px 0px #2c3e50;
-            margin-bottom: 30px;
-        }
-
-        textarea {
-            width: 100%;
-            height: 120px;
-            font-family: 'Poppins', sans-serif;
-            font-size: 1rem;
-            padding: 10px;
-            border: 2px dashed #7f8c8d;
-            border-radius: 10px;
-            outline: none;
-            box-sizing: border-box;
-            resize: vertical;
-        }
-        button {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            font-family: 'Caveat', cursive;
-            font-size: 1.8rem;
-            background-color: #f39c12;
-            color: #fff;
-            border: 3px solid #2c3e50;
-            border-radius: 2px 255px 3px 25px / 255px 5px 225px 3px;
-            cursor: pointer;
-            margin-top: 15px;
-            transition: 0.2s;
-            box-shadow: 4px 4px 0px #2c3e50;
-        }
-        button:hover {
-            background-color: #e67e22;
-            transform: translateY(2px);
-            box-shadow: 2px 2px 0px #2c3e50;
-        }
-        .loader {
-            display: none;
-            text-align: center;
-            font-weight: bold;
-            color: #d35400;
-            margin-top: 10px;
-        }
-        
-        pre {
-            background-color: #f8f9f9;
-            padding: 15px;
-            border-left: 5px solid #f39c12;
-            overflow-x: auto;
-            font-size: 0.9rem;
-        }
-        #result-section {
-            display: none;
-        }
+        body { font-family: 'Poppins', sans-serif; background-color: #f4f1ea; color: #2c3e50; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .container { max-width: 800px; width: 100%; }
+        h1 { font-family: 'Caveat', cursive; font-size: 3.5rem; text-align: center; margin-bottom: 10px; text-shadow: 2px 2px 0px #ffb6b9; }
+        p.subtitle { text-align: center; font-weight: 600; margin-bottom: 30px; }
+        .sketch-box { border: 3px solid #2c3e50; border-radius: 2px 255px 3px 25px / 255px 5px 225px 3px; padding: 25px; background: #fff; box-shadow: 6px 6px 0px #2c3e50; margin-bottom: 30px; }
+        textarea { width: 100%; height: 120px; font-family: 'Poppins', sans-serif; font-size: 1rem; padding: 10px; border: 2px dashed #7f8c8d; border-radius: 10px; outline: none; box-sizing: border-box; resize: vertical; }
+        button { display: block; width: 100%; padding: 15px; font-family: 'Caveat', cursive; font-size: 1.8rem; background-color: #f39c12; color: #fff; border: 3px solid #2c3e50; border-radius: 2px 255px 3px 25px / 255px 5px 225px 3px; cursor: pointer; margin-top: 15px; transition: 0.2s; box-shadow: 4px 4px 0px #2c3e50; }
+        button:hover { background-color: #e67e22; transform: translateY(2px); box-shadow: 2px 2px 0px #2c3e50; }
+        .loader { display: none; text-align: center; font-weight: bold; color: #d35400; margin-top: 10px; }
+        pre { background-color: #f8f9f9; padding: 15px; border-left: 5px solid #f39c12; overflow-x: auto; font-size: 0.9rem; white-space: pre-wrap; word-wrap: break-word; }
+        #result-section { display: none; }
     </style>
 </head>
 <body>
-
     <div class="container">
         <h1>🎬 AI Line Producer</h1>
         <p class="subtitle">Multi-Agent Script Breakdown & Logistics Planner</p>
@@ -121,7 +43,8 @@
             </div>
         </div>
     </div>
-<script>
+
+    <script>
         async function runPipeline() {
             const scriptText = document.getElementById('scriptInput').value;
             if (!scriptText) {
@@ -129,7 +52,6 @@
                 return;
             }
 
-            // Show loading, hide old results
             document.getElementById('loading').style.display = 'block';
             document.getElementById('result-section').style.display = 'none';
 
@@ -141,39 +63,31 @@
                 });
 
                 let resultText = await response.text();
-                
-                // Clean basic markdown tags if present
-                let cleanText = resultText.replace(/```json/g, "").replace(/```/g, "").trim();
+                let cleanText = resultText.replace(/```json/g, "").replace(/
+```/g, "").trim();
 
                 try {
-                    // Koshish karega strict JSON parse karne ki
                     let data = JSON.parse(cleanText);
-                    
-                    // Fallback keys in case AI changes the JSON structure
                     let breakdown = data.sceneBreakdown ? JSON.stringify(data.sceneBreakdown, null, 2) : JSON.stringify(data, null, 2);
                     let logistics = data.logisticsAndPlanning ? JSON.stringify(data.logisticsAndPlanning, null, 2) : "Check the Scene Breakdown section above for all details.";
                     
                     document.getElementById('breakdownOutput').textContent = breakdown;
                     document.getElementById('logisticsOutput').textContent = logistics;
-                    
                 } catch (parseError) {
-                    // THE BULLETPROOF HACK: Agar JSON parse fail ho jaye, toh error mat dikhao!
-                    // Seedha AI ka raw text output screen par daal do.
-                    document.getElementById('breakdownOutput').textContent = resultText;
-                    document.getElementById('logisticsOutput').textContent = "⚠️ Note: The AI generated standard text instead of structured JSON format this time. Please read the complete plan in the box above.";
+                    // YEH NAYA CODE HAI: Agar AI kharab JSON dega, tab bhi raw data print hoga!
+                    document.getElementById('breakdownOutput').textContent = cleanText;
+                    document.getElementById('logisticsOutput').textContent = "⚠️ Note: AI ne is baar JSON ki jagah raw text diya hai. Upar box mein pura plan check karein.";
                 }
 
                 document.getElementById('result-section').style.display = 'block';
 
             } catch (error) {
-                document.getElementById('result-section').style.display = 'block';
                 document.getElementById('breakdownOutput').textContent = "Server connection error. Please try again.";
+                document.getElementById('result-section').style.display = 'block';
             } finally {
-                // Hide loading
                 document.getElementById('loading').style.display = 'none';
             }
         }
     </script>
-
-   
+</body>
 </html>
