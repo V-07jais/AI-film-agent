@@ -121,8 +121,7 @@
             </div>
         </div>
     </div>
-
-    <script>
+<script>
         async function runPipeline() {
             const scriptText = document.getElementById('scriptInput').value;
             if (!scriptText) {
@@ -142,33 +141,39 @@
                 });
 
                 let resultText = await response.text();
-                resultText = resultText.replace(/```json/g, "").replace(/```/g, "").trim();
+                
+                // Clean basic markdown tags if present
+                let cleanText = resultText.replace(/```json/g, "").replace(/```/g, "").trim();
 
-                let data;
                 try {
-                    // Strict Parsing
-                    data = JSON.parse(resultText);
+                    // Koshish karega strict JSON parse karne ki
+                    let data = JSON.parse(cleanText);
+                    
+                    // Fallback keys in case AI changes the JSON structure
+                    let breakdown = data.sceneBreakdown ? JSON.stringify(data.sceneBreakdown, null, 2) : JSON.stringify(data, null, 2);
+                    let logistics = data.logisticsAndPlanning ? JSON.stringify(data.logisticsAndPlanning, null, 2) : "Check the Scene Breakdown section above for all details.";
+                    
+                    document.getElementById('breakdownOutput').textContent = breakdown;
+                    document.getElementById('logisticsOutput').textContent = logistics;
+                    
                 } catch (parseError) {
-                    // Smart Fallback: Agar AI ne quotes me galti ki hai, toh forcefully read karega
-                    console.log("Fixing AI JSON formatting...");
-                    data = new Function("return " + resultText)();
+                    // THE BULLETPROOF HACK: Agar JSON parse fail ho jaye, toh error mat dikhao!
+                    // Seedha AI ka raw text output screen par daal do.
+                    document.getElementById('breakdownOutput').textContent = resultText;
+                    document.getElementById('logisticsOutput').textContent = "⚠️ Note: The AI generated standard text instead of structured JSON format this time. Please read the complete plan in the box above.";
                 }
 
-                // Display formatting
-                document.getElementById('breakdownOutput').textContent = JSON.stringify(data.sceneBreakdown, null, 2);
-                document.getElementById('logisticsOutput').textContent = JSON.stringify(data.logisticsAndPlanning, null, 2);
                 document.getElementById('result-section').style.display = 'block';
 
             } catch (error) {
-                // THE UX FIX: No ugly popup alerts! Beautiful on-screen error handling.
                 document.getElementById('result-section').style.display = 'block';
-                document.getElementById('breakdownOutput').textContent = "⚠️ Oops! The AI agents got slightly confused while formatting the data.\n\n💡 Try hitting 'Generate' again, or change a few words in your script.";
-                document.getElementById('logisticsOutput').textContent = "System Log for Judges: The AI returned an unparseable or misaligned JSON string in this attempt.";
+                document.getElementById('breakdownOutput').textContent = "Server connection error. Please try again.";
             } finally {
                 // Hide loading
                 document.getElementById('loading').style.display = 'none';
             }
-        } // YEH WALA BRACKET MISSING THA!
+        }
     </script>
-</body>
+
+   
 </html>
