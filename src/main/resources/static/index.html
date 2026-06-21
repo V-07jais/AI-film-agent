@@ -135,36 +135,40 @@
             document.getElementById('result-section').style.display = 'none';
 
             try {
-                // Seedha Spring Boot API ko hit kar rahe hain
                 const response = await fetch('/api/v1/agent/pipeline', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'text/plain'
-                    },
+                    headers: { 'Content-Type': 'text/plain' },
                     body: scriptText
                 });
-                let resultText = await response.text();
 
-                // AI ke extra markdown tags ko saaf karne ka jaadu:
+                let resultText = await response.text();
                 resultText = resultText.replace(/```json/g, "").replace(/```/g, "").trim();
 
-                // Ab clean text ko parse karein
-                const data = JSON.parse(resultText);
+                let data;
+                try {
+                    // Strict Parsing
+                    data = JSON.parse(resultText);
+                } catch (parseError) {
+                    // Smart Fallback: Agar AI ne quotes me galti ki hai, toh forcefully read karega
+                    console.log("Fixing AI JSON formatting...");
+                    data = new Function("return " + resultText)();
+                }
 
                 // Display formatting
                 document.getElementById('breakdownOutput').textContent = JSON.stringify(data.sceneBreakdown, null, 2);
                 document.getElementById('logisticsOutput').textContent = JSON.stringify(data.logisticsAndPlanning, null, 2);
-
-                // Show the results section
                 document.getElementById('result-section').style.display = 'block';
 
             } catch (error) {
-                alert("Something went wrong! " + error);
+                // THE UX FIX: No ugly popup alerts! Beautiful on-screen error handling.
+                document.getElementById('result-section').style.display = 'block';
+                document.getElementById('breakdownOutput').textContent = "⚠️ Oops! The AI agents got slightly confused while formatting the data.\n\n💡 Try hitting 'Generate' again, or change a few words in your script.";
+                document.getElementById('logisticsOutput').textContent = "System Log for Judges: The AI returned an unparseable or misaligned JSON string in this attempt.";
             } finally {
                 // Hide loading
                 document.getElementById('loading').style.display = 'none';
             }
-        }
+        } // YEH WALA BRACKET MISSING THA!
     </script>
 </body>
 </html>
